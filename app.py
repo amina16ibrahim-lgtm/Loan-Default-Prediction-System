@@ -170,7 +170,11 @@ final_input_df = input_data_df.reindex(
 
 # Ensure correct column order
 final_input_df = final_input_df[model_columns]
-    
+
+    # Make prediction
+    prediction = model.predict(final_input_df)[0]
+
+    # Calculate prediction probability
     probability = model.predict_proba(
         final_input_df
     )[0][1]
