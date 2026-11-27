@@ -160,16 +160,14 @@ if st.button("🔍 Predict Loan Risk"):
     # Create a DataFrame from the input dictionary
     input_data_df = pd.DataFrame(input_dict)
 
+    # Match input columns with the original training columns
+    final_input_df = input_data_df.reindex(
+        columns=model_columns,
+        fill_value=0
+    )
 
-   # Match input columns with the original training columns
-
-final_input_df = input_data_df.reindex(
-    columns=model_columns,
-    fill_value=0
-)
-
-# Ensure correct column order
-final_input_df = final_input_df[model_columns]
+    # Ensure correct column order
+    final_input_df = final_input_df[model_columns]
 
     # Make prediction
     prediction = model.predict(final_input_df)[0]
@@ -178,6 +176,7 @@ final_input_df = final_input_df[model_columns]
     probability = model.predict_proba(
         final_input_df
     )[0][1]
+
 
     st.divider()
 
