@@ -14,6 +14,7 @@ st.set_page_config(
 # LOAD MODEL
 
 model = joblib.load("loan_default_model.pkl")
+model_columns = joblib.load("model_columns.pkl")
 
 # CUSTOM CSS
 
@@ -160,37 +161,16 @@ if st.button("🔍 Predict Loan Risk"):
     input_data_df = pd.DataFrame(input_dict)
 
 
-    # Get the column names from the training data X
-    # This list is obtained from the kernel state's 'X' variable.
-    expected_columns = [
-        'Age', 'Income', 'LoanAmount', 'CreditScore', 'MonthsEmployed',
-        'NumCreditLines', 'InterestRate', 'LoanTerm', 'DTIRatio',
-        'Education_High School', "Education_Master's", 'Education_PhD',
-        'EmploymentType_Part-time', 'EmploymentType_Self-employed', 'EmploymentType_Un'
-        'EmploymentType_Unemployed', 'MaritalStatus_Married', 'MaritalStatus_Single',
-        'HasMortgage_Yes', 'HasDependents_Yes', 'LoanPurpose_Business',
-        'LoanPurpose_Education', 'LoanPurpose_Home', 'LoanPurpose_Other',
-        'HasCoSigner_Yes'
-    ]
+   # Match input columns with the original training columns
 
-    # Create an empty DataFrame with all expected columns
-    final_input_df = pd.DataFrame(columns=expected_columns)
+final_input_df = input_data_df.reindex(
+    columns=model_columns,
+    fill_value=0
+)
 
-    # Populate the known numeric features
-    for col in input_data_df.columns:
-        if col in final_input_df.columns:
-            final_input_df[col] = input_data_df[col]
-
-    # Fill all other columns (categorical one-hot encoded) with 0
-    for col in final_input_df.columns:
-        if col not in input_data_df.columns:
-            final_input_df[col] = 0
-
-    # Ensure the order of columns matches the training data 'X'
-    final_input_df = final_input_df[expected_columns]
-
-    prediction = model.predict(final_input_df)[0]
-
+# Ensure correct column order
+final_input_df = final_input_df[model_columns]
+    
     probability = model.predict_proba(
         final_input_df
     )[0][1]
